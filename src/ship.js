@@ -1,5 +1,5 @@
 const shipFactory = (size) => {
-  if (![3, 2, 4, 5].includes(size)) {
+  if (![2, 3, 4, 5].includes(size)) {
     throw RangeError("Invalid Size");
   }
 
