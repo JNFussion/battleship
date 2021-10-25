@@ -6,6 +6,8 @@ const canvas = (canvasDom) => {
   const height = element.clientHeight;
   const unitX = width / 10;
   const unitY = height / 10;
+  const offset = 2.5;
+  const reduceShipBy = 5;
   const stage = new Konva.Stage({
     container: element.id,
     width,
@@ -15,7 +17,6 @@ const canvas = (canvasDom) => {
     gridLayer: new Konva.Layer(),
     shipsLayer: new Konva.Layer(),
   };
-
   stage.add(layers.gridLayer);
   stage.add(layers.shipsLayer);
 
@@ -53,10 +54,10 @@ const canvas = (canvasDom) => {
 
     newGroup.add(
       new Konva.Rect({
-        x,
-        y,
-        width: unitX * size,
-        height: unitY,
+        x: offset,
+        y: offset,
+        width: unitX * size - reduceShipBy,
+        height: unitY - reduceShipBy,
         fill: "purple",
         stroke: "red",
         strokeWidth: 1,
@@ -66,10 +67,10 @@ const canvas = (canvasDom) => {
     );
     newGroup.add(
       new Konva.Rect({
-        x,
-        y,
-        width: unitX * size,
-        height: unitY,
+        x: offset,
+        y: offset,
+        width: unitX * size - reduceShipBy,
+        height: unitY - reduceShipBy,
         fill: "red",
         stroke: "#FAFAFA",
         strokeWidth: 1,
@@ -111,6 +112,31 @@ const canvas = (canvasDom) => {
     return rect.getParent().find(".shadow")[0];
   }
 
+  function setPositionOnGrid(rectToMove, rectMoveTo) {
+    rectToMove.position({
+      x: Math.round(rectMoveTo.x() / unitX) * unitX + offset,
+      y: Math.round(rectMoveTo.y() / unitY) * unitY + offset,
+    });
+  }
+
+  function haveIntersection(r1, r2) {
+    return !(
+      r2.x > r1.x + r1.width + unitX ||
+      r2.x + r2.width + unitX < r1.x ||
+      r2.y > r1.y + r1.height + unitY ||
+      r2.y + r2.height + unitY < r1.y
+    );
+  }
+
+  function anyHaveIntersection(layer, { target }) {
+    const targetRect = target.getClientRect();
+    return !layer.find(".body").some((rect) => {
+      if (rect === target) return;
+      // eslint-disable-next-line consistent-return
+      return haveIntersection(rect.getClientRect(), targetRect);
+    });
+  }
+
   /*
     Snap to grid of rect
     Source: https://medium.com/@pierrebleroux/snap-to-grid-with-konvajs-c41eae97c13f
@@ -128,22 +154,20 @@ const canvas = (canvasDom) => {
 
   layers.shipsLayer.on("dragend", (e) => {
     const shadowShip = getShadow(e.target);
-    e.target.position({
-      x: Math.round(e.target.x() / unitX) * unitX,
-      y: Math.round(e.target.y() / unitY) * unitY,
-    });
+    setPositionOnGrid(e.target, shadowShip);
     stage.batchDraw();
     shadowShip.hide();
   });
 
   layers.shipsLayer.on("dragmove", (e) => {
     const shadowShip = getShadow(e.target);
-    shadowShip.position({
-      x: Math.round(e.target.x() / unitX) * unitX,
-      y: Math.round(e.target.y() / unitY) * unitY,
-    });
     keepInsideBounds(e.target);
     keepInsideBounds(shadowShip);
+
+    if (anyHaveIntersection(layers.shipsLayer, e)) {
+      setPositionOnGrid(shadowShip, e.target);
+    }
+
     stage.batchDraw();
   });
 
