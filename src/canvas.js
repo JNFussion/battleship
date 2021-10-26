@@ -113,10 +113,17 @@ const canvas = (canvasDom) => {
   }
 
   function setPositionOnGrid(rectToMove, rectMoveTo) {
-    rectToMove.position({
-      x: Math.round(rectMoveTo.x() / unitX) * unitX + offset,
-      y: Math.round(rectMoveTo.y() / unitY) * unitY + offset,
-    });
+    if (rectToMove.rotation() === 90) {
+      rectToMove.position({
+        x: Math.round(rectMoveTo.x() / unitX) * unitX - offset,
+        y: Math.round(rectMoveTo.y() / unitY) * unitY + offset,
+      });
+    } else {
+      rectToMove.position({
+        x: Math.round(rectMoveTo.x() / unitX) * unitX + offset,
+        y: Math.round(rectMoveTo.y() / unitY) * unitY + offset,
+      });
+    }
   }
 
   function haveIntersection(r1, r2) {
@@ -137,12 +144,41 @@ const canvas = (canvasDom) => {
     });
   }
 
+  // EVENTS
+
+  let oldAttrs;
+  let oldAttrsShadow;
+
+  layers.shipsLayer.on("click", (e) => {
+    const rect = e.target;
+    const shadowRect = getShadow(rect);
+    oldAttrs = { ...rect.getAttrs() };
+    oldAttrsShadow = { ...shadowRect.getAttrs() };
+
+    if (rect.rotation() === 90) {
+      rect.rotate(-90);
+      rect.x(oldAttrs.x - rect.height());
+      shadowRect.rotate(-90);
+      shadowRect.x(oldAttrsShadow.x - shadowRect.height());
+    } else {
+      rect.rotate(90);
+      rect.x(oldAttrs.x + rect.height());
+      shadowRect.rotate(90);
+      shadowRect.x(oldAttrsShadow.x + shadowRect.height());
+    }
+    keepInsideBounds(rect);
+    keepInsideBounds(shadowRect);
+
+    if (!anyHaveIntersection(layers.shipsLayer, e)) {
+      rect.setAttrs(oldAttrs);
+      shadowRect.setAttrs(oldAttrsShadow);
+    }
+  });
+
   /*
     Snap to grid of rect
     Source: https://medium.com/@pierrebleroux/snap-to-grid-with-konvajs-c41eae97c13f
   */
-
-  // EVENTS
 
   layers.shipsLayer.on("dragstart", (e) => {
     const shadowShip = getShadow(e.target);
@@ -167,7 +203,6 @@ const canvas = (canvasDom) => {
     if (anyHaveIntersection(layers.shipsLayer, e)) {
       setPositionOnGrid(shadowShip, e.target);
     }
-
     stage.batchDraw();
   });
 
