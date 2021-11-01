@@ -78,7 +78,19 @@ const canvas = (canvasDom) => {
         visible: false,
       })
     );
+
     layers.shipsLayer.add(newGroup);
+    return newGroup;
+  }
+
+  function isInsideBounds(ship) {
+    const shipPos = ship.getAbsolutePosition();
+    return (
+      shipPos.x + ship.width() < stage.width() &&
+      shipPos.x > 0 &&
+      shipPos.y + ship.height() < stage.height() &&
+      shipPos.y > 0
+    );
   }
 
   /*
@@ -135,44 +147,105 @@ const canvas = (canvasDom) => {
     );
   }
 
-  function anyHaveIntersection(layer, { target }) {
+  function isAnyOverlapping(layer, target) {
     const targetRect = target.getClientRect();
-    return !layer.find(".body").some((rect) => {
+    return layer.find(".body").some((rect) => {
       if (rect === target) return;
       // eslint-disable-next-line consistent-return
       return haveIntersection(rect.getClientRect(), targetRect);
     });
   }
 
+  function shipRotation(ship) {
+    const shadowShip = getShadow(ship);
+    const oldAttrs = { ...ship.getAttrs() };
+    const oldAttrsShadow = { ...shadowShip.getAttrs() };
+    const oldRotation = ship.rotation();
+    const oldRotationShadow = shadowShip.rotation();
+    if (ship.rotation() === 90) {
+      ship.rotate(-90);
+      ship.x(oldAttrs.x - ship.height());
+      shadowShip.rotate(-90);
+      shadowShip.x(oldAttrsShadow.x - shadowShip.height());
+    } else {
+      ship.rotate(90);
+      ship.x(oldAttrs.x + ship.height());
+      shadowShip.rotate(90);
+      shadowShip.x(oldAttrsShadow.x + shadowShip.height());
+    }
+    keepInsideBounds(ship);
+    keepInsideBounds(shadowShip);
+    if (isAnyOverlapping(layers.shipsLayer, ship)) {
+      ship.rotation(oldRotation);
+      ship.setAttrs(oldAttrs);
+      shadowShip.rotation(oldRotation);
+      shadowShip.setAttrs(oldRotationShadow);
+    }
+  }
+
+  function getRandomInt(min, max) {
+    return Math.round(Math.random() * (max - min)) + min;
+  }
+
+  function initBoardPlaces() {
+    const arr = [];
+
+    for (let i = 0; i < 9; i += 1) {
+      for (let j = 0; j < 10; j += 1) {
+        arr.push({ x: unitX * i, y: unitY * j });
+      }
+    }
+    return arr;
+  }
+
+  function randomizeShips() {
+    const availablePos = initBoardPlaces();
+    for (let size = 2; size <= 5; size += 1) {
+      for (let j = size; j <= 5; j += 1) {
+        let randomPos = availablePos[getRandomInt(0, availablePos.length - 1)];
+        const group = newRectangle(randomPos, size);
+        const ship = group.children[0];
+        let validPlacement = false;
+        const auxAvailablePos = [...availablePos];
+        do {
+          if (
+            !isAnyOverlapping(layers.shipsLayer, ship) &&
+            isInsideBounds(ship)
+          ) {
+            validPlacement = true;
+            availablePos.splice(availablePos.indexOf(randomPos), 1);
+            break;
+          }
+          const rotation = ship.rotation();
+          shipRotation(ship);
+          if (rotation !== ship.rotation()) {
+            validPlacement = true;
+            availablePos.splice(availablePos.indexOf(randomPos), 1);
+            break;
+          }
+          auxAvailablePos.splice(auxAvailablePos.indexOf(randomPos), 1);
+          if (auxAvailablePos.length === 0) return -1;
+
+          randomPos =
+            auxAvailablePos[getRandomInt(0, auxAvailablePos.length - 1)];
+          group.position(randomPos);
+        } while (!validPlacement);
+      }
+    }
+    return layers.shipsLayer;
+  }
+
+  function placeRandom() {
+    if (randomizeShips() === -1) {
+      layers.shipsLayer.removeChildren();
+      placeRandom();
+    }
+  }
+
   // EVENTS
 
-  let oldAttrs;
-  let oldAttrsShadow;
-
   layers.shipsLayer.on("click", (e) => {
-    const rect = e.target;
-    const shadowRect = getShadow(rect);
-    oldAttrs = { ...rect.getAttrs() };
-    oldAttrsShadow = { ...shadowRect.getAttrs() };
-
-    if (rect.rotation() === 90) {
-      rect.rotate(-90);
-      rect.x(oldAttrs.x - rect.height());
-      shadowRect.rotate(-90);
-      shadowRect.x(oldAttrsShadow.x - shadowRect.height());
-    } else {
-      rect.rotate(90);
-      rect.x(oldAttrs.x + rect.height());
-      shadowRect.rotate(90);
-      shadowRect.x(oldAttrsShadow.x + shadowRect.height());
-    }
-    keepInsideBounds(rect);
-    keepInsideBounds(shadowRect);
-
-    if (!anyHaveIntersection(layers.shipsLayer, e)) {
-      rect.setAttrs(oldAttrs);
-      shadowRect.setAttrs(oldAttrsShadow);
-    }
+    shipRotation(e.target);
   });
 
   /*
@@ -200,13 +273,18 @@ const canvas = (canvasDom) => {
     keepInsideBounds(e.target);
     keepInsideBounds(shadowShip);
 
-    if (anyHaveIntersection(layers.shipsLayer, e)) {
+    if (!isAnyOverlapping(layers.shipsLayer, e.target)) {
       setPositionOnGrid(shadowShip, e.target);
     }
     stage.batchDraw();
   });
 
-  return { element, drawBoard, newRectangle };
+  return {
+    element,
+    drawBoard,
+    newRectangle,
+    placeRandom,
+  };
 };
 
 export default canvas;
