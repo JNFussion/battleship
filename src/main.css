@@ -12,3 +12,9 @@
     @apply box-border;
   }
 }
+
+@layer components {
+  .btn {
+    @apply m-4 rounded-sm border border-solid border-spanish-viridian bg-spanish-viridian-dark;
+  }
+}

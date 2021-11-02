@@ -1,4 +1,5 @@
 import Konva from "konva";
+import { enumDirection } from "./gameboard";
 
 const canvas = (canvasDom) => {
   const element = canvasDom;
@@ -19,6 +20,23 @@ const canvas = (canvasDom) => {
   };
   stage.add(layers.gridLayer);
   stage.add(layers.shipsLayer);
+
+  function getShips() {
+    const ships = [];
+
+    layers.shipsLayer.find(".body").forEach((s) => {
+      const pos = s.getAbsolutePosition();
+      const obj = {};
+      obj.startCoords = [Math.round(pos.y / unitY), Math.round(pos.x / unitX)];
+      obj.direction = s.rotation()
+        ? enumDirection.VERTICAL
+        : enumDirection.HORIZONTAL;
+      obj.size = Math.round(s.width() / unitX);
+      ships.push(obj);
+    });
+
+    return ships;
+  }
 
   function drawBoard() {
     for (let x = unitX; x < width; x += unitX) {
@@ -198,7 +216,7 @@ const canvas = (canvasDom) => {
     return arr;
   }
 
-  function randomizeShips() {
+  function randomiseShips() {
     const availablePos = initBoardPlaces();
     for (let size = 2; size <= 5; size += 1) {
       for (let j = size; j <= 5; j += 1) {
@@ -236,7 +254,7 @@ const canvas = (canvasDom) => {
   }
 
   function placeRandom() {
-    if (randomizeShips() === -1) {
+    if (randomiseShips() === -1) {
       layers.shipsLayer.removeChildren();
       placeRandom();
     }
@@ -281,6 +299,7 @@ const canvas = (canvasDom) => {
 
   return {
     element,
+    getShips,
     drawBoard,
     newRectangle,
     placeRandom,

@@ -8,10 +8,12 @@
   </head>
   <body class="font-roboto min-h-screen text-android-green bg-eerie-black">
     <section class="">
-      <h1 class="font-press-start-2P font-black text-5xl">Battleship</h1>
-      <div class="flex justify-evenly">
+      <h1 class="p-4 font-press-start-2p font-black text-5xl">Battleship</h1>
+      <div class="my-4 flex justify-evenly">
         <article class="">
-          <h2 class="text-2xl font-semibold">YOUR FLEET</h2>
+          <h2 class="font-press-start-2p text-xl font-semibold text-center">
+            YOUR FLEET
+          </h2>
           <div class="w-500px h-500px grid grid-cols-11 grid-rows-11">
             <ul
               class="
@@ -65,9 +67,14 @@
               "
             ></div>
           </div>
+          <footer>
+            <button id="randomise-btn" class="btn py-2 px-3">Randomize</button>
+          </footer>
         </article>
         <article class="">
-          <h2 class="text-2xl font-semibold">ENEMY'S FLEET</h2>
+          <h2 class="font-press-start-2p text-xl font-semibold text-center">
+            ENEMY'S FLEET
+          </h2>
           <div class="w-500px h-500px grid grid-cols-11 grid-rows-11">
             <ul
               class="
@@ -110,6 +117,19 @@
               <li class="">I</li>
               <li class="">J</li>
             </ul>
+            <div
+              id="overlay"
+              class="
+                col-start-2 col-end-grid-end
+                row-start-2 row-end-grid-end
+                z-10
+                grid
+                place-content-center
+                bg-eerie-black bg-opacity-90
+              "
+            >
+              <button id="play-btn" class="btn px-6 py-2 text-2xl">Play</button>
+            </div>
             <div
               id="enemy-board"
               class="

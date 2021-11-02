@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { gameboard } from "./gameboard";
+import ship from "./ship";
 
 const player = (turn, pc = false) => {
   const board = gameboard();
@@ -10,6 +11,12 @@ const player = (turn, pc = false) => {
       return false;
     }
     return !shotsRecord.includes(coords);
+  };
+
+  const initPlayerBoard = (arr) => {
+    arr.forEach((s) => {
+      board.placeShip(s.startCoords, s.direction, ship(s.size));
+    });
   };
 
   const generateAttackCoords = () => {
@@ -26,6 +33,7 @@ const player = (turn, pc = false) => {
     turn,
     board,
     isPc,
+    initPlayerBoard,
     attack(enemy, coords) {
       if (isPc()) {
         coords = generateAttackCoords();

@@ -13,6 +13,10 @@ module.exports = {
     colors: {
       "eerie-black": "#1B1B1B",
       "android-green": "#AACC00",
+      "spanish-viridian": {
+        DEFAULT: "#007F5F",
+        dark: "#00291F",
+      },
     },
     extend: {
       gridTemplateRows: {
@@ -42,7 +46,7 @@ module.exports = {
         "sans-serif",
       ],
       "black-ops": ["Black Ops One", "cursive"],
-      "press-start-2P": ["Press Start 2P", "cursive"],
+      "press-start-2p": ["'Press Start 2P'", "cursive"],
     },
   },
   variants: {

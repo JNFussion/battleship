@@ -4,7 +4,24 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 
 module.exports = {
   mode: "development",
-  entry: "./src/index.js",
+  entry: {
+    index: "./src/index.js",
+    canvas: "./src/canvas.js",
+    dom: {
+      import: "./src/dom.js",
+      dependOn: "canvas",
+    },
+    gameboard: "./src/gameboard.js",
+    player: {
+      import: "./src/player.js",
+      dependOn: "gameboard",
+    },
+    game: {
+      import: "./src/game.js",
+      dependOn: "player",
+    },
+    ship: "./src/ship.js",
+  },
   plugins: [
     new HtmlWebpackPlugin({
       title: "Output Management",
@@ -16,6 +33,9 @@ module.exports = {
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist"),
     clean: true,
+  },
+  optimization: {
+    runtimeChunk: "single",
   },
   module: {
     rules: [
