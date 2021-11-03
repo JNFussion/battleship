@@ -4,6 +4,7 @@ const ESLintPlugin = require("eslint-webpack-plugin");
 
 module.exports = {
   mode: "development",
+  cache: false,
   entry: {
     index: "./src/index.js",
     canvas: "./src/canvas.js",
@@ -61,6 +62,11 @@ module.exports = {
           },
           "postcss-loader",
         ],
+      },
+      {
+        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+
+        type: "asset/resource",
       },
     ],
   },

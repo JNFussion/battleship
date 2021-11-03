@@ -4,7 +4,7 @@ import game from "./game";
 (() => {
   const runningGame = game();
   const player1Canvas = canvas(document.getElementById("player-board"));
-  const player2Canvas = canvas(document.getElementById("enemy-board"));
+  const player2Canvas = canvas(document.getElementById("enemy-board"), true);
   const randomiseButton = document.getElementById("randomise-btn");
   const playButton = document.getElementById("play-btn");
 
@@ -14,12 +14,14 @@ import game from "./game";
     player1Canvas.drawBoard();
     player1Canvas.placeRandom();
     player2Canvas.drawBoard();
+    player2Canvas.placeRandom();
   });
 
   randomiseButton.addEventListener("click", player1Canvas.placeRandom);
   playButton.addEventListener(
     "click",
     () => {
+      player1Canvas.startGame();
       runningGame.player1.initPlayerBoard(player1Canvas.getShips());
       runningGame.player2.initPlayerBoard(player2Canvas.getShips());
 
