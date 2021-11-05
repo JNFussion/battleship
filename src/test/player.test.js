@@ -1,11 +1,11 @@
-import { enumDirection } from "../gameboard";
+import { enumID, enumDirection } from "../enums";
 import player from "../player";
 import shipFactory from "../ship";
 
 describe("Player Attack", () => {
   describe("Human Attack", () => {
-    const humanPlayer = player(true);
-    const pcPlayer = player(false, true);
+    const humanPlayer = player(enumID.PJ1, true);
+    const pcPlayer = player(enumID.PJ2, false, true);
     beforeAll(() => {
       pcPlayer.board.placeShip(
         [0, 0],
@@ -26,7 +26,10 @@ describe("Player Attack", () => {
       );
     });
     test("Attack [0,0]", () => {
-      expect(humanPlayer.attack(pcPlayer, [0, 0])).toBe(true);
+      expect(humanPlayer.attack(pcPlayer, [0, 0])).toEqual({
+        goodHit: true,
+        attackedCoords: [0, 0],
+      });
     });
 
     test("Not player's turn", () => {
@@ -35,7 +38,10 @@ describe("Player Attack", () => {
 
     test("Attack [4,4]", () => {
       humanPlayer.turn = true;
-      expect(humanPlayer.attack(pcPlayer, [4, 4])).toBe(false);
+      expect(humanPlayer.attack(pcPlayer, [4, 4])).toEqual({
+        goodHit: false,
+        attackedCoords: [4, 4],
+      });
     });
 
     test("Unvalid coords", () => {

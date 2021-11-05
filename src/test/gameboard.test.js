@@ -1,5 +1,6 @@
-import { gameboard, enumDirection } from "../gameboard";
+import gameboard from "../gameboard";
 import shipFactory from "../ship";
+import { enumDirection } from "../enums";
 
 describe("Place ship", () => {
   let board;

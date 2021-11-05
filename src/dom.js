@@ -1,10 +1,16 @@
 import canvas from "./canvas";
+import { enumID } from "./enums";
 import game from "./game";
 
 (() => {
-  const runningGame = game();
-  const player1Canvas = canvas(document.getElementById("player-board"));
-  const player2Canvas = canvas(document.getElementById("enemy-board"), true);
+  const player1Canvas = canvas(
+    enumID.PJ1,
+    document.getElementById("player-board")
+  );
+  const player2Canvas = canvas(
+    enumID.PJ2,
+    document.getElementById("enemy-board")
+  );
   const randomiseButton = document.getElementById("randomise-btn");
   const playButton = document.getElementById("play-btn");
 
@@ -22,9 +28,10 @@ import game from "./game";
     "click",
     () => {
       player1Canvas.startGame();
-      runningGame.player1.initPlayerBoard(player1Canvas.getShips());
-      runningGame.player2.initPlayerBoard(player2Canvas.getShips());
-
+      player2Canvas.startGame();
+      game.player1.initPlayerBoard(player1Canvas.getShips());
+      game.player2.initPlayerBoard(player2Canvas.getShips());
+      randomiseButton.removeEventListener("click", player1Canvas.placeRandom);
       document.getElementById("overlay").remove();
     },
     { once: true }

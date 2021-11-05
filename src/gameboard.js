@@ -1,13 +1,11 @@
-/* eslint-disable no-plusplus */
-const enumDirection = {
-  HORIZONTAL: "horizontal",
-  VERTICAL: "vertical",
-};
+import { enumDirection } from "./enums";
+
 const cell = (startCoords, direction, ship) => ({
   startCoords,
   direction,
   ship,
 });
+
 const gameboard = () => {
   const grid = Array(10)
     .fill()
@@ -44,10 +42,9 @@ const gameboard = () => {
     ) {
       throw Error("Ship overflow grid");
     }
-
     const start =
       direction === enumDirection.HORIZONTAL ? startCoords[1] : startCoords[0];
-    for (let [i, index] = [0, start]; i < ship.size; i++, index++) {
+    for (let [i, index] = [0, start]; i < ship.size; i += 1, index += 1) {
       const col =
         direction === enumDirection.HORIZONTAL ? index : startCoords[1];
       const row =
@@ -62,18 +59,20 @@ const gameboard = () => {
   };
 
   const receiveAttack = (coords) => {
-    if (grid[coords[0]][coords[1]] !== undefined) {
-      const targetCell = cellLists[grid[coords[0]][coords[1]]];
-      const pos = Math.sqrt(
-        (coords[0] - targetCell.startCoords[0]) ** 2 +
-          (coords[1] - targetCell.startCoords[1]) ** 2
-      );
-      return targetCell.ship.hit(pos);
-    }
-    if (grid[coords[0]][coords[1]] !== "W") {
+    if (grid[coords[0]][coords[1]] === undefined) {
       grid[coords[0]][coords[1]] = "W";
+      return false;
     }
-    return false;
+
+    if (grid[coords[0]][coords[1]] === "W") {
+      return false;
+    }
+    const targetCell = cellLists[grid[coords[0]][coords[1]]];
+    const pos = Math.sqrt(
+      (coords[0] - targetCell.startCoords[0]) ** 2 +
+        (coords[1] - targetCell.startCoords[1]) ** 2
+    );
+    return targetCell.ship.hit(pos);
   };
 
   const allAreSunk = () => cellLists.every((c) => c.ship.isSunk());
@@ -81,4 +80,4 @@ const gameboard = () => {
   return { grid, placeShip, receiveAttack, allAreSunk };
 };
 
-export { gameboard, enumDirection };
+export default gameboard;

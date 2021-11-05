@@ -1,10 +1,11 @@
+import PubSub from "pubsub-js";
 import Canvg from "canvg";
 import Konva from "konva";
-import { enumDirection } from "./gameboard";
+import { enumDirection, enumID } from "./enums";
 import waterIcon from "./icons/water-solid.svg";
 import fireIcon from "./icons/fire-solid.svg";
 
-const canvas = (canvasDom, enemyCanvas = false) => {
+const canvas = (id, canvasDom) => {
   const element = canvasDom;
   const width = element.clientWidth;
   const height = element.clientHeight;
@@ -16,6 +17,7 @@ const canvas = (canvasDom, enemyCanvas = false) => {
     container: element.id,
     width,
     height,
+    id,
   });
   const layers = {
     gridLayer: new Konva.Layer(),
@@ -35,17 +37,13 @@ const canvas = (canvasDom, enemyCanvas = false) => {
   stage.add(layers.shipsLayer);
   stage.add(layers.attacksLayer);
 
-  function isEnemyCanvas() {
-    return enemyCanvas;
-  }
-
   function getShips() {
     const ships = [];
 
     layers.shipsLayer.find(".body").forEach((s) => {
       const pos = s.getAbsolutePosition();
       const obj = {};
-      obj.startCoords = [Math.round(pos.y / unitY), Math.round(pos.x / unitX)];
+      obj.startCoords = [Math.floor(pos.y / unitY), Math.floor(pos.x / unitX)];
       obj.direction = s.rotation()
         ? enumDirection.VERTICAL
         : enumDirection.HORIZONTAL;
@@ -86,6 +84,7 @@ const canvas = (canvasDom, enemyCanvas = false) => {
       width: unitX * size,
       height: unitY,
       id: `ship-${size}-${x}-${y}`,
+      visible: true /* stage.id() === enumID.PJ1 */,
     });
 
     newGroup.add(
@@ -98,7 +97,7 @@ const canvas = (canvasDom, enemyCanvas = false) => {
         stroke: "#D4D700",
         strokeWidth: 1,
         name: `body`,
-        draggable: !isEnemyCanvas(),
+        draggable: stage.id() === enumID.PJ1,
       })
     );
     newGroup.add(
@@ -114,9 +113,6 @@ const canvas = (canvasDom, enemyCanvas = false) => {
         visible: false,
       })
     );
-    if (isEnemyCanvas()) {
-      newGroup.visible(false);
-    }
 
     layers.shipsLayer.add(newGroup);
     return newGroup;
@@ -132,11 +128,12 @@ const canvas = (canvasDom, enemyCanvas = false) => {
     );
   }
 
-  function newIcon(iconType, { x, y }) {
+  function newIcon({ iconType, coords, playerID }) {
+    if (stage.id() !== playerID) return;
     const img = new Konva.Image({
-      image: iconType,
-      x,
-      y,
+      image: icons[iconType],
+      x: coords.x * unitX,
+      y: coords.y * unitY,
       width: unitX,
       height: unitY,
       strokeWidth: 1,
@@ -144,10 +141,9 @@ const canvas = (canvasDom, enemyCanvas = false) => {
     });
     const imgClient = img.getClientRect();
     img.position({
-      x: (img.width() - imgClient.width) / 2,
-      y: (img.height() - imgClient.height) / 2,
+      x: imgClient.x + (img.width() - imgClient.width) / 2,
+      y: imgClient.y + (img.height() - imgClient.height) / 2,
     });
-
     layers.attacksLayer.add(img);
   }
 
@@ -302,6 +298,22 @@ const canvas = (canvasDom, enemyCanvas = false) => {
 
   function startGame() {
     layers.shipsLayer.listening(false);
+    stage.on("click", () => {
+      const pointerPos = stage.getPointerPosition();
+      PubSub.publishSync("playRound", {
+        id: stage.id(),
+        coords: [
+          Math.floor(pointerPos.y / unitY),
+          Math.floor(pointerPos.x / unitX),
+        ],
+      });
+    });
+  }
+
+  const subMethods = { newIcon };
+
+  function subcriptionHandler(msg, data) {
+    subMethods[msg](data);
   }
 
   // EVENTS
@@ -362,6 +374,8 @@ const canvas = (canvasDom, enemyCanvas = false) => {
     stage.container().style.cursor = "default";
   });
 
+  PubSub.subscribe("newIcon", subcriptionHandler);
+
   return {
     element,
     getShips,
@@ -369,6 +383,7 @@ const canvas = (canvasDom, enemyCanvas = false) => {
     newRectangle,
     placeRandom,
     startGame,
+    subcriptionHandler,
   };
 };
 
