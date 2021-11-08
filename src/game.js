@@ -14,6 +14,16 @@ const game = (() => {
         coords: { x: result.attackedCoords[1], y: result.attackedCoords[0] },
         playerID: enemy.id,
       });
+      if (!playerAttacking.isPc()) {
+        const cell = enemy.board.getCell(coords);
+        if (cell.ship.isSunk()) {
+          PubSub.publish("showSunkenShip", {
+            playerID: enemy.id,
+            size: cell.ship.size,
+            coords: cell.startCoords,
+          });
+        }
+      }
     } else {
       PubSub.publish("newIcon", {
         iconType: "water",
@@ -22,8 +32,14 @@ const game = (() => {
       });
     }
 
+    if (enemy.board.allAreSunk()) {
+      PubSub.publish("endGame", playerAttacking.id);
+    }
+
     if (enemy.isPc()) {
-      setTimeout(round(enemy, playerAttacking), 500);
+      setTimeout(() => {
+        round(enemy, playerAttacking);
+      }, 500);
     }
   }
 

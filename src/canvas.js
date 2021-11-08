@@ -84,7 +84,7 @@ const canvas = (id, canvasDom) => {
       width: unitX * size,
       height: unitY,
       id: `ship-${size}-${x}-${y}`,
-      visible: true /* stage.id() === enumID.PJ1 */,
+      visible: stage.id() === enumID.PJ1,
     });
 
     newGroup.add(
@@ -138,6 +138,7 @@ const canvas = (id, canvasDom) => {
       height: unitY,
       strokeWidth: 1,
       scale: { x: 0.8, y: 0.8 },
+      opacity: 0.2,
     });
     const imgClient = img.getClientRect();
     img.position({
@@ -145,6 +146,11 @@ const canvas = (id, canvasDom) => {
       y: imgClient.y + (img.height() - imgClient.height) / 2,
     });
     layers.attacksLayer.add(img);
+
+    img.to({
+      duration: 0.5,
+      opacity: 1,
+    });
   }
 
   /*
@@ -284,6 +290,13 @@ const canvas = (id, canvasDom) => {
             auxAvailablePos[getRandomInt(0, auxAvailablePos.length - 1)];
           group.position(randomPos);
         } while (!validPlacement);
+        const tempID = group.id();
+        const newID = tempID.replace(
+          /((\d{1,3}(\.?\d{1,14})?)-(\d{1,3}(\.?\d{1,14})?))$/,
+          `${randomPos.x}-${randomPos.y}`
+        );
+
+        group.id(newID);
       }
     }
     return layers.shipsLayer;
@@ -310,7 +323,17 @@ const canvas = (id, canvasDom) => {
     });
   }
 
-  const subMethods = { newIcon };
+  function showSunkenShip({ playerID, size, coords }) {
+    if (playerID !== id) return;
+    const group = layers.shipsLayer.findOne(
+      `#ship-${size}-${coords[1] * unitX}-${coords[0] * unitY}`
+    );
+
+    group.setAttrs({ visible: true });
+    group.opacity(0.25);
+  }
+
+  const subMethods = { newIcon, showSunkenShip };
 
   function subcriptionHandler(msg, data) {
     subMethods[msg](data);
@@ -375,8 +398,9 @@ const canvas = (id, canvasDom) => {
   });
 
   PubSub.subscribe("newIcon", subcriptionHandler);
-
+  PubSub.subscribe("showSunkenShip", subcriptionHandler);
   return {
+    id,
     element,
     getShips,
     drawBoard,

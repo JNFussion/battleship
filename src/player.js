@@ -22,13 +22,16 @@ const player = (id, turn, pc = false) => {
   };
 
   const generateAttackCoords = () => {
-    const coords = [
-      Math.floor(Math.random() * 10),
-      Math.floor(Math.random() * 10),
-    ];
-    if (shotsRecord.includes(coords)) {
-      generateAttackCoords();
-    }
+    let coords;
+    let allreadyShot;
+    do {
+      coords = [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)];
+      allreadyShot = shotsRecord.some(
+        // eslint-disable-next-line no-loop-func
+        (shot) => shot[0] === coords[0] && shot[1] === coords[1]
+      );
+    } while (allreadyShot);
+
     return coords;
   };
   return {

@@ -27,6 +27,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: "Output Management",
       template: "./src/index.html",
+      favicon: "./src/icons/ship-solid.svg",
     }),
     new ESLintPlugin(),
   ],

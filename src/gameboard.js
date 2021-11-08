@@ -12,6 +12,8 @@ const gameboard = () => {
     .map(() => Array(10).fill());
   const cellLists = [];
 
+  const getCell = (coords) => cellLists[grid[coords[0]][coords[1]]];
+
   // eslint-disable-next-line consistent-return
   const placeShip = (startCoords, direction, ship) => {
     if (!Array.isArray(startCoords)) {
@@ -77,7 +79,7 @@ const gameboard = () => {
 
   const allAreSunk = () => cellLists.every((c) => c.ship.isSunk());
 
-  return { grid, placeShip, receiveAttack, allAreSunk };
+  return { grid, getCell, placeShip, receiveAttack, allAreSunk };
 };
 
 export default gameboard;

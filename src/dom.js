@@ -1,8 +1,20 @@
+import PubSub from "pubsub-js";
 import canvas from "./canvas";
 import { enumID } from "./enums";
 import game from "./game";
 
 (() => {
+  const messages = {
+    win: {
+      title: "Your enemy is now sleeping with the fishes.",
+      subtitle: "Keep ploughing through the Sea.",
+    },
+    defeat: {
+      title: "You have been tossed into Davy Jones's Locker.",
+      subtitle: "Emerge among the dead and seek revenge.",
+    },
+  };
+
   const player1Canvas = canvas(
     enumID.PJ1,
     document.getElementById("player-board")
@@ -13,6 +25,25 @@ import game from "./game";
   );
   const randomiseButton = document.getElementById("randomise-btn");
   const playButton = document.getElementById("play-btn");
+
+  const renderEndGame = (msg, player) => {
+    const overlay = document.getElementById("end-game-overlay");
+    const title = document.getElementById("end-game-title");
+    const subtitle = document.getElementById("end-game-subtitle");
+    const newGameBtn = document.getElementById("new-game");
+
+    const result = player === player1Canvas.id ? "win" : "defeat";
+
+    title.textContent = messages[result].title;
+    subtitle.textContent = messages[result].subtitle;
+
+    newGameBtn.addEventListener("click", () => {
+      // eslint-disable-next-line no-restricted-globals
+      location.reload();
+    });
+
+    overlay.classList.toggle("hidden");
+  };
 
   // EVENTS
 
@@ -36,4 +67,6 @@ import game from "./game";
     },
     { once: true }
   );
+
+  PubSub.subscribe("endGame", renderEndGame);
 })();

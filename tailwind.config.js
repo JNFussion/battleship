@@ -48,6 +48,9 @@ module.exports = {
       "black-ops": ["Black Ops One", "cursive"],
       "press-start-2p": ["'Press Start 2P'", "cursive"],
     },
+    inset: {
+      "1/10": "10%",
+    },
   },
   variants: {
     extend: {},

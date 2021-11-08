@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body class="font-roboto min-h-screen text-android-green bg-eerie-black">
+  <body
+    class="relative min-h-screen font-roboto text-android-green bg-eerie-black"
+  >
     <section class="">
       <h1 class="p-4 font-press-start-2p font-black text-5xl">Battleship</h1>
       <div class="my-4 flex justify-evenly">
@@ -144,5 +146,29 @@
         </article>
       </div>
     </section>
+
+    <div
+      id="end-game-overlay"
+      class="
+        hidden
+        absolute
+        z-50
+        top-1/10
+        h-5/6
+        w-full
+        top-0
+        grid
+        place-content-center
+        bg-eerie-black bg-opacity-95
+      "
+    >
+      <article class="p-4">
+        <h3 id="end-game-title" class="text-4xl font-bold"></h3>
+        <h4 id="end-game-subtitle" class="text-center text-2xl"></h4>
+        <button id="new-game" class="btn block mx-auto px-4 py-2 text-xl">
+          New Game
+        </button>
+      </article>
+    </div>
   </body>
 </html>
