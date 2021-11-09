@@ -41,20 +41,6 @@ module.exports = {
       gridRowEnd: {
         "grid-end": "-1",
       },
-      width: {
-        "500px": "500px",
-        "87.5%": "87.5%",
-      },
-      height: {
-        "500px": "500px",
-      },
-      spacing: {
-        120: "30rem",
-        140: "35rem",
-      },
-      inset: {
-        "1/10": "10%",
-      },
       screens: {
         "4xl": "1920px",
       },

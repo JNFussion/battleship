@@ -28,6 +28,14 @@ Click **Play** when you be ready.
 4. Ships that have been hit are mark with a fire icon.
 5. Missed attacks are mark with a water emblem.
 
+## Improvement
+
+- IA attack adjacent cells when a ship is hit.
+
+- Board doesn't respond properly when window is resized.
+
+- If window is resize and Randomize is clicked, it freezes the page.
+
 ## Resources used:
 
 - Webpack as module bundler. [Link](https://webpack.js.org/)

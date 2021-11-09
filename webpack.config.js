@@ -3,8 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 
 module.exports = {
-  mode: "development",
-  cache: false,
+  mode: "production",
   entry: {
     index: "./src/index.js",
     canvas: "./src/canvas.js",
