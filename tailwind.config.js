@@ -18,23 +18,6 @@ module.exports = {
         dark: "#00291F",
       },
     },
-    extend: {
-      gridTemplateRows: {
-        11: "repeat(11, minmax(0, 1fr))",
-      },
-      gridColumnEnd: {
-        "grid-end": "-1",
-      },
-      gridRowEnd: {
-        "grid-end": "-1",
-      },
-      width: {
-        "500px": "500px",
-      },
-      height: {
-        "500px": "500px",
-      },
-    },
     fontFamily: {
       roboto: [
         "Roboto",
@@ -48,8 +31,33 @@ module.exports = {
       "black-ops": ["Black Ops One", "cursive"],
       "press-start-2p": ["'Press Start 2P'", "cursive"],
     },
-    inset: {
-      "1/10": "10%",
+    extend: {
+      gridTemplateRows: {
+        11: "repeat(11, minmax(0, 1fr))",
+      },
+      gridColumnEnd: {
+        "grid-end": "-1",
+      },
+      gridRowEnd: {
+        "grid-end": "-1",
+      },
+      width: {
+        "500px": "500px",
+        "87.5%": "87.5%",
+      },
+      height: {
+        "500px": "500px",
+      },
+      spacing: {
+        120: "30rem",
+        140: "35rem",
+      },
+      inset: {
+        "1/10": "10%",
+      },
+      screens: {
+        "4xl": "1920px",
+      },
     },
   },
   variants: {

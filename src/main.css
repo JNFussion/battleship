@@ -17,4 +17,31 @@
   .btn {
     @apply m-4 rounded-sm border border-solid border-spanish-viridian bg-spanish-viridian-dark;
   }
+  .board-container {
+    @apply max-w-md p-4 sm:py-2 sm:mx-auto xl:max-w-lg xl:flex-auto 4xl:max-w-xl;
+  }
+  .board-container .board-title {
+    @apply font-press-start-2p font-semibold text-center;
+  }
+  .board-container .board-wrapper {
+    @apply w-full grid grid-cols-11 grid-rows-11;
+  }
+  .board-wrapper .list {
+    @apply flex justify-around items-end;
+  }
+  .list.horizontal {
+    @apply col-start-2 col-end-grid-end border-l text-center;
+  }
+  .list.vertical {
+    @apply row-start-2 row-end-grid-end pr-2 flex-col border-t;
+  }
+
+  .board-wrapper .board {
+    padding-top: 100%;
+    @apply relative w-full col-start-2 col-end-grid-end row-start-2 row-end-grid-end border border-android-green;
+  }
+
+  .board .stage-container {
+    @apply absolute top-0 right-0 bottom-0 left-0;
+  }
 }

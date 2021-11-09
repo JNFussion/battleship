@@ -311,7 +311,7 @@ const canvas = (id, canvasDom) => {
 
   function startGame() {
     layers.shipsLayer.listening(false);
-    stage.on("click", () => {
+    stage.on("click tap", () => {
       const pointerPos = stage.getPointerPosition();
       PubSub.publishSync("playRound", {
         id: stage.id(),
@@ -333,6 +333,21 @@ const canvas = (id, canvasDom) => {
     group.opacity(0.25);
   }
 
+  function fitStageIntoParentContainer() {
+    const container = element.parentElement;
+
+    // now we need to fit stage into parent container
+    const containerWidth = container.clientWidth;
+
+    // but we also make the full scene visible
+    // so we need to scale all objects on canvas
+    const scale = containerWidth / width;
+
+    stage.width(width * scale);
+    stage.height(height * scale);
+    stage.scale({ x: scale, y: scale });
+  }
+
   const subMethods = { newIcon, showSunkenShip };
 
   function subcriptionHandler(msg, data) {
@@ -342,6 +357,7 @@ const canvas = (id, canvasDom) => {
   // EVENTS
 
   window.addEventListener("load", () => {
+    fitStageIntoParentContainer();
     Canvg.from(icons.water.getContext("2d"), waterIcon).then((v) => {
       v.resize(unitX, unitY, "xMidYMid meet");
       v.render();
@@ -352,7 +368,9 @@ const canvas = (id, canvasDom) => {
     });
   });
 
-  layers.shipsLayer.on("click", (e) => {
+  window.addEventListener("resize", fitStageIntoParentContainer);
+
+  layers.shipsLayer.on("click tap", (e) => {
     shipRotation(e.target);
   });
 
